@@ -4,15 +4,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
 
-# RUN add-apt-repository ppa:webupd8team/java
-RUN apt-get update && \
-apt-get install -y --no-install-recommends \
-        openjdk-9-jdk
-
 COPY ./install.sh /
 RUN chmod +x /install.sh
 
 WORKDIR /app
+COPY ./openjdk-8-jdk-headless_8u332-ga-1~deb9u1_arm64.deb .
 COPY ./elasticsearch-1.7.0.deb .
 
 RUN /install.sh
@@ -22,8 +18,11 @@ RUN /install.sh
 COPY logging.yml /usr/share/elasticsearch/config/
 COPY elasticsearch.yml /usr/share/elasticsearch/config/
 
+#RUN update-alternatives --set java /usr/lib/jvm/jdk1.8.0_version/bin/java
+
 USER elasticsearch
 
 ENV PATH=$PATH:/usr/share/elasticsearch/bin
 
-CMD ["elasticsearch"]
+CMD ["/bin/bash"]
+#CMD ["elasticsearch"]
