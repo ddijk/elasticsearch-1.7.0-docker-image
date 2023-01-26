@@ -1,0 +1,29 @@
+FROM debian:buster-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
+
+# RUN add-apt-repository ppa:webupd8team/java
+RUN apt-get update && \
+apt-get install -y --no-install-recommends \
+        openjdk-9-jdk
+
+COPY ./install.sh /
+RUN chmod +x /install.sh
+
+WORKDIR /app
+COPY ./elasticsearch-1.7.0.deb .
+
+RUN /install.sh
+# Prints installed java version, just for checking
+#CMD ["java", "-version"]
+
+COPY logging.yml /usr/share/elasticsearch/config/
+COPY elasticsearch.yml /usr/share/elasticsearch/config/
+
+USER elasticsearch
+
+ENV PATH=$PATH:/usr/share/elasticsearch/bin
+
+CMD ["elasticsearch"]
